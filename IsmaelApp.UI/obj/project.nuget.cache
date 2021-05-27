@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XQIKiDlgMPO0k3D+wx+RANyQHsdX4bGPbi8fuuOFsCPYIQbtZr4WII90+KMQynIak+gpIYteymufxvdskpV9IA==",
+  "dgSpecHash": "HQNGaUAql2t/9RYECJX+SG/S72k2+DF0IT09jB3ARVOZc5F9zghGfI00j5vaQhucsY0FMPUjPk9MmmAnuhyFOA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\andrey.alvarado\\source\\repos\\IsmaelApp.UI\\IsmaelApp.UI\\IsmaelApp.UI.csproj",
+  "projectFilePath": "C:\\Users\\andrey.alvarado\\Source\\Repos\\POC 2 - Deploying NETCORE to IIS IO\\IsmaelApp.UI\\IsmaelApp.UI.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
