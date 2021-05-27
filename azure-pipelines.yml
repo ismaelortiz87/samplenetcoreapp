@@ -13,15 +13,18 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - task: DotNetCoreCLI@2
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
       inputs:
-        command: 'build'
-        arguments: '--configuration $(buildconfiguration) --output $(System.DefaultWorkingDirectory)/release'
-    - task: DotNetCoreCLI@2
+        restoreSolution: '$(solution)'
+
+    - task: VSBuild@1
       inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: '--output $(System.DefaultWorkingDirectory)/release'
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
      
     - task: ArchiveFiles@2
       displayName: 'Zipping Generated Artifacts'
