@@ -1,0 +1,84 @@
+trigger:
+  branches:
+    include:
+    - master
+variables:
+- name: buildConfiguration
+  value: 'Release'
+
+stages:
+- stage: Build
+  jobs:
+  - job: buildTheApp
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        arguments: '--configuration $(buildconfiguration) --output $(System.DefaultWorkingDirectory)/release'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--output $(System.DefaultWorkingDirectory)/release'
+     
+    - task: ArchiveFiles@2
+      displayName: 'Zipping Generated Artifacts'
+      inputs:
+        rootFolderOrFile: 
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+        replaceExistingArchive: true
+       
+    - task: PublishBuildArtifacts@1
+      inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+        
+- stage: deploy
+  jobs:
+  - deployment: VMDeploy
+    displayName: deploying onpremise
+    pool:
+      vmImage: 'Ubuntu-latest'
+    environment:
+     name: 'serautsqa01'
+     resourceType: VirtualMachine
+     resourceName: SERAUTSQA01
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
+              destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
+              cleanDestinationFolder: true
+              overwriteExistingFiles: true
+          - task: IISWebAppManagementOnMachineGroup@0
+            inputs:
+              IISDeploymentType: 'IISWebsite'
+              ActionIISWebsite: 'CreateOrUpdateWebsite'
+              WebsiteName: 'netcoreapp3'
+              WebsitePhysicalPath: 'C:\netcoreapp3'
+              WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+              AddBinding: true
+              CreateOrUpdateAppPoolForWebsite: true
+              AppPoolNameForWebsite: 'netcoreapp3'
+              DotNetVersionForWebsite: 'No Managed Code'
+              PipeLineModeForWebsite: 'Integrated'
+              AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+          - task: IISWebAppDeploymentOnMachineGroup@0
+            inputs:
+              WebSiteName: 'netcoreapp3'
+              VirtualApplication: 'netcoreapp3'
+              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/.'
+              TakeAppOfflineFlag: true
+          - task: IISWebAppManagementOnMachineGroup@0
+            inputs:
+              IISDeploymentType: 'IISWebsite'
+              ActionIISWebsite: 'StartWebsite'
+              StartStopWebsiteName: 'netcoreapp3'
