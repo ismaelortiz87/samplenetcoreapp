@@ -15,18 +15,25 @@ stages:
     steps:
     - task: NuGetToolInstaller@1
 
-    - task: NuGetCommand@2
+# do this before your build tasks
+steps:
+    - task: DotNetCoreCLI@2
+      displayName: Restore
       inputs:
-        restoreSolution: '$(solution)'
+        command: restore
+        projects: '**/*.csproj'
+        feedsToUse: config
+        nugetConfigPath: NuGet.config    # Relative to root of the repository
+        externalFeedCredentials: <Name of the NuGet service connection>
 
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-     
-    - task: ArchiveFiles@2
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          command: build
+          projects: '**/*.csproj'
+          arguments: '--configuration $(buildConfiguration)' # Update this to match your need
+
+      - task: ArchiveFiles@2
       displayName: 'Zipping Generated Artifacts'
       inputs:
         rootFolderOrFile: 
