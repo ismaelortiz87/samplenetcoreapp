@@ -13,35 +13,27 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
-    - task: NuGetToolInstaller@1
 
-# do this before your build tasks
-steps:
-    - task: DotNetCoreCLI@2
-      displayName: Restore
+    - task: UseDotNet@2
       inputs:
-        command: restore
-        projects: '**/*.csproj'
-        feedsToUse: config
-        nugetConfigPath: NuGet.config    # Relative to root of the repository
-        externalFeedCredentials: <Name of the NuGet service connection>
-
-      - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          command: build
-          projects: '**/*.csproj'
-          arguments: '--configuration $(buildConfiguration)' # Update this to match your need
-
-      - task: ArchiveFiles@2
+        version: '5.0.x'
+        includePreviewVersions: true # Required for preview versions
+      
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        command: 'build'
+        configuration: $(buildConfiguration)
+      
+    - task: ArchiveFiles@2
       displayName: 'Zipping Generated Artifacts'
       inputs:
-        rootFolderOrFile: 
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
-        replaceExistingArchive: true
-       
+          rootFolderOrFile: 
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+          replaceExistingArchive: true
+              
     - task: PublishBuildArtifacts@1
       inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
