@@ -11,7 +11,7 @@ stages:
   jobs:
   - job: buildTheApp
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     steps:
     - task: NuGetToolInstaller@1
 
