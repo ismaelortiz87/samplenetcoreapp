@@ -45,11 +45,11 @@ stages:
   - deployment: VMDeploy
     displayName: deploying onpremise
     pool:
-      vmImage: 'Ubuntu-latest'
+      vmImage: 'windows-latest'
     environment:
-     name: 'serautsqa01'
+     name: 'io-iis'
      resourceType: VirtualMachine
-     resourceName: SERAUTSQA01
+     resourceName: kuzko
     strategy:
       runOnce:
         deploy:
