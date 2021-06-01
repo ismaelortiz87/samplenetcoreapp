@@ -1,0 +1,105 @@
+trigger:
+  branches:
+    include:
+    - master
+
+variables:
+    solution: '**/*.sln'
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+    name: buildConfiguration
+
+stages:
+- stage: Build
+  jobs:
+  - job: buildTheApp
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+
+    - task: VSTest@2
+      inputs:
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+        FileCopyOptions: 
+
+  
+- stage: deploy
+  jobs:
+  - deployment: VMDeploy
+    displayName: deploying onpremise
+    pool:
+      vmImage: 'windows-latest'
+    environment:
+     name: 'io-iis'
+     resourceType: VirtualMachine
+     resourceName: kuzko
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
+              destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
+              cleanDestinationFolder: true
+              overwriteExistingFiles: true
+          - task: IISWebAppManagementOnMachineGroup@0
+            inputs:
+              IISDeploymentType: 'IISWebsite'
+              ActionIISWebsite: 'CreateOrUpdateWebsite'
+              WebsiteName: 'netcorepoc3'
+              WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcorepoc3'
+              WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+              AddBinding: true
+              Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5003","hostname":"","sslThumbprint":"","sniFlag":false}]}'
+              CreateOrUpdateAppPoolForWebsite: true
+              AppPoolNameForWebsite: 'netcorepoc3'
+              DotNetVersionForWebsite: 'No Managed Code'
+              PipeLineModeForWebsite: 'Integrated'
+              AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+          - task: IISWebAppDeploymentOnMachineGroup@0
+            inputs:
+              WebSiteName: 'netcorepoc'
+              VirtualApplication: 'netcorepoc'
+              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/.'
+              TakeAppOfflineFlag: true
+          - task: IISWebAppManagementOnMachineGroup@0
+            inputs:
+              IISDeploymentType: 'IISWebsite'
+              ActionIISWebsite: 'StartWebsite'
+              StartStopWebsiteName: 'netcorepoc'
+
+
+
+
+
+
+
+
+
+
+    # - task: AzureRmWebAppDeployment@4
+    #   inputs:
+    #     ConnectionType: 'AzureRM'
+    #     azureSubscription: 'io_subscription'
+    #     appType: 'webApp'
+    #     WebAppName: 'netcorepoc'
+    #     packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
