@@ -15,30 +15,30 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
-    - task: NuGetToolInstaller@1
-
-    - task: NuGetCommand@2
+    - task: DotNetCoreCLI@2
       inputs:
-        restoreSolution: '$(solution)'
-
-    - task: VSBuild@1
+        command: 'build'
+        arguments: '--configuration $(buildconfiguration) --output $(System.DefaultWorkingDirectory)/release'
+    - task: DotNetCoreCLI@2
       inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-
-    - task: VSTest@2
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--output $(System.DefaultWorkingDirectory)/release'
+     
+    - task: ArchiveFiles@2
+      displayName: 'Zipping Generated Artifacts'
       inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+        rootFolderOrFile: $(System.DefaultWorkingDirectory)/release
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+        replaceExistingArchive: true
+       
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         ArtifactName: 'drop'
         publishLocation: 'Container'
-        FileCopyOptions: 
-
   
 - stage: deploy
   jobs:
