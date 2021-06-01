@@ -1,13 +1,12 @@
 trigger:
   branches:
     include:
-    - master
+    - none
 
 variables:
     solution: '**/*.sln'
     buildPlatform: 'Any CPU'
     buildConfiguration: 'Release'
-    name: buildConfiguration
 
 stages:
 - stage: Build
