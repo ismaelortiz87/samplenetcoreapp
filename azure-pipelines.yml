@@ -1,44 +1,81 @@
-trigger:
-  branches:
-    include:
-    - master
+# trigger:
+#   branches:
+#     include:
+#     - master
+# variables:
+# - name: buildConfiguration
+#   value: 'Release'
+
+# stages:
+# - stage: Build
+#   jobs:
+#   - job: buildTheApp
+#     pool:
+#       vmImage: 'windows-latest'
+#     steps:
+
+
 variables:
-- name: buildConfiguration
-  value: 'Release'
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
-stages:
-- stage: Build
-  jobs:
-  - job: buildTheApp
-    pool:
-      vmImage: 'windows-latest'
-    steps:
+- task: NuGetToolInstaller@1
 
-    - task: UseDotNet@2
-      inputs:
-        version: '5.0.x'
-        includePreviewVersions: true # Required for preview versions
-      
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
-        command: 'build'
-        configuration: $(buildConfiguration)
-      
-    - task: ArchiveFiles@2
-      displayName: 'Zipping Generated Artifacts'
-      inputs:
-          rootFolderOrFile: 
-          includeRootFolder: false
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
-          replaceExistingArchive: true
-              
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'io_subscription'
+    appType: 'webApp'
+    WebAppName: 'netcorepoc'
+    packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
     - task: PublishBuildArtifacts@1
       inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
+
+#     - task: UseDotNet@2
+#       inputs:
+#         version: '5.0.x'
+#         includePreviewVersions: true # Required for preview versions
+      
+#     - task: DotNetCoreCLI@2
+#       displayName: 'dotnet build'
+#       inputs:
+#         command: 'build'
+#         configuration: $(buildConfiguration)
+      
+#     - task: ArchiveFiles@2
+#       displayName: 'Zipping Generated Artifacts'
+#       inputs:
+#           rootFolderOrFile: 
+#           includeRootFolder: false
+#           archiveType: 'zip'
+#           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+#           replaceExistingArchive: true
+##
         
 - stage: deploy
   jobs:
