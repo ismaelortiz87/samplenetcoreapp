@@ -1,60 +1,56 @@
-# trigger:
-#   branches:
-#     include:
-#     - master
-# variables:
-# - name: buildConfiguration
-#   value: 'Release'
-
-# stages:
-# - stage: Build
-#   jobs:
-#   - job: buildTheApp
-#     pool:
-#       vmImage: 'windows-latest'
-#     steps:
-
-
+trigger:
+  branches:
+    include:
+    - none
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- name: buildConfiguration
+  value: 'Release'
 
-- task: NuGetToolInstaller@1
+stages:
+- stage: Build
+  jobs:
+  - job: buildTheApp
+    pool:
+      vmImage: 'windows-latest'
+    steps:
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+      - task: NuGetToolInstaller@1
 
-- task: AzureRmWebAppDeployment@4
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'io_subscription'
-    appType: 'webApp'
-    WebAppName: 'netcorepoc'
-    packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-    - task: PublishBuildArtifacts@1
-      inputs:
+      - task: NuGetCommand@2
+        inputs:
+          restoreSolution: '$(solution)'
+
+      - task: VSBuild@1
+        inputs:
+          solution: '$(solution)'
+          msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip" /p:DeployIisAppPath="Default Web Site"'
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+
+      - task: VSTest@2
+        inputs:
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+      - task: PublishBuildArtifacts@1
+        inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
+
+      - task: AzureRmWebAppDeployment@4
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'io_subscription'
+          appType: 'webApp'
+          WebAppName: 'netcorepoc'
+          packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+      - task: PublishBuildArtifacts@1
+        inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
 
 #     - task: UseDotNet@2
 #       inputs:
@@ -75,7 +71,6 @@ variables:
 #           archiveType: 'zip'
 #           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
 #           replaceExistingArchive: true
-##
         
 - stage: deploy
   jobs:
