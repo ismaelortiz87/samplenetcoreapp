@@ -114,7 +114,7 @@ stages:
             inputs:
               WebSiteName: 'netcorepoc'
               VirtualApplication: 'netcorepoc'
-              Package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)/**/*.zip'
+              Package: '$(System.ArtifactsDirectory)/$(Build.BuildId)/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
