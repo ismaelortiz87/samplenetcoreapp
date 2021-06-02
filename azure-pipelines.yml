@@ -47,10 +47,11 @@ stages:
         includePreviewVersions: true # Required for preview versions
       
     - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
       inputs:
         command: 'publish'
-        publishWebProjects: true
+        publishWebProjects: false
+        modifyOutputPath: false
+
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
