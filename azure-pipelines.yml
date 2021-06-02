@@ -67,47 +67,47 @@ stages:
     #       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
     #       replaceExistingArchive: true
         
-- stage: deploy
-  jobs:
-  - deployment: VMDeploy
-    displayName: deploying onpremise
-    pool:
-      vmImage: 'windows-latest'
-    environment:
-     name: 'io-iis'
-     resourceType: VirtualMachine
-     resourceName: kuzko
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: ExtractFiles@1
-            inputs:
-              archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
-              destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
-              cleanDestinationFolder: true
-              overwriteExistingFiles: true
-          - task: IISWebAppManagementOnMachineGroup@0
-            inputs:
-              IISDeploymentType: 'IISWebsite'
-              ActionIISWebsite: 'CreateOrUpdateWebsite'
-              WebsiteName: 'netcorepoc'
-              WebsitePhysicalPath: 'C:\netcorepoc'
-              WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
-              AddBinding: true
-              CreateOrUpdateAppPoolForWebsite: true
-              AppPoolNameForWebsite: 'netcorepoc'
-              DotNetVersionForWebsite: 'No Managed Code'
-              PipeLineModeForWebsite: 'Integrated'
-              AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
-          - task: IISWebAppDeploymentOnMachineGroup@0
-            inputs:
-              WebSiteName: 'netcorepoc'
-              VirtualApplication: 'netcorepoc'
-              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/.'
-              TakeAppOfflineFlag: true
-          - task: IISWebAppManagementOnMachineGroup@0
-            inputs:
-              IISDeploymentType: 'IISWebsite'
-              ActionIISWebsite: 'StartWebsite'
-              StartStopWebsiteName: 'netcorepoc'
+# - stage: deploy
+#   jobs:
+#   - deployment: VMDeploy
+#     displayName: deploying onpremise
+#     pool:
+#       vmImage: 'windows-latest'
+#     environment:
+#      name: 'io-iis'
+#      resourceType: VirtualMachine
+#      resourceName: kuzko
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: ExtractFiles@1
+#             inputs:
+#               archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
+#               destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
+#               cleanDestinationFolder: true
+#               overwriteExistingFiles: true
+#           - task: IISWebAppManagementOnMachineGroup@0
+#             inputs:
+#               IISDeploymentType: 'IISWebsite'
+#               ActionIISWebsite: 'CreateOrUpdateWebsite'
+#               WebsiteName: 'netcorepoc'
+#               WebsitePhysicalPath: 'C:\netcorepoc'
+#               WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+#               AddBinding: true
+#               CreateOrUpdateAppPoolForWebsite: true
+#               AppPoolNameForWebsite: 'netcorepoc'
+#               DotNetVersionForWebsite: 'No Managed Code'
+#               PipeLineModeForWebsite: 'Integrated'
+#               AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+#           - task: IISWebAppDeploymentOnMachineGroup@0
+#             inputs:
+#               WebSiteName: 'netcorepoc'
+#               VirtualApplication: 'netcorepoc'
+#               Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/.'
+#               TakeAppOfflineFlag: true
+#           - task: IISWebAppManagementOnMachineGroup@0
+#             inputs:
+#               IISDeploymentType: 'IISWebsite'
+#               ActionIISWebsite: 'StartWebsite'
+#               StartStopWebsiteName: 'netcorepoc'
