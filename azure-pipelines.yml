@@ -102,7 +102,7 @@ stages:
               IISDeploymentType: 'IISWebsite'
               ActionIISWebsite: 'CreateOrUpdateWebsite'
               WebsiteName: 'netcore3'
-              WebsitePhysicalPath: 'C:\inetpub\wwwroot\'
+              WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore3'
               WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
               AddBinding: true
               CreateOrUpdateAppPoolForWebsite: true
@@ -113,7 +113,6 @@ stages:
           - task: IISWebAppDeploymentOnMachineGroup@0
             inputs:
               WebSiteName: 'netcore3'
-              VirtualApplication: 'netcore3'
               Package: '$(Pipeline.Workspace)/$(Build.BuildId)/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
