@@ -45,11 +45,16 @@ stages:
       inputs:
         version: '5.0.x'
         includePreviewVersions: true # Required for preview versions
-      
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'
+        arguments: '-c Release'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
         publishWebProjects: false
+        arguments: '-c Release'
         modifyOutputPath: false
 
     - task: PublishPipelineArtifact@1
