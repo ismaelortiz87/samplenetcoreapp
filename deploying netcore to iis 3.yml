@@ -78,7 +78,7 @@ stages:
             inputs:
               WebSiteName: 'netcorepoc3'
               VirtualApplication: 'netcorepoc3'
-              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/.'
+              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/**/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
