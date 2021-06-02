@@ -59,10 +59,11 @@ stages:
     - task: CopyFiles@2
       inputs:
         Contents: '**/*.zip'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/Build.BuildId'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+        flattenFolders: true
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '''$(Build.ArtifactStagingDirectory)/Build.BuildId'''
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
         publishLocation: 'pipeline'
     
       
