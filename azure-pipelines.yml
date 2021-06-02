@@ -112,12 +112,12 @@ stages:
               AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
           - task: IISWebAppDeploymentOnMachineGroup@0
             inputs:
-              WebSiteName: 'netcorepoc'
-              VirtualApplication: 'netcorepoc'
+              WebSiteName: 'netcorepoc3'
+              VirtualApplication: 'netcorepoc3'
               Package: '$(Pipeline.Workspace)/$(Build.BuildId)/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
               IISDeploymentType: 'IISWebsite'
               ActionIISWebsite: 'StartWebsite'
-              StartStopWebsiteName: 'netcorepoc'
+              StartStopWebsiteName: 'netcorepoc3'
