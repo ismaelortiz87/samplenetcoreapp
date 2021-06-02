@@ -97,6 +97,12 @@ stages:
           #     destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
           #     cleanDestinationFolder: true
           #     overwriteExistingFiles: false
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'specific'
+              itemPattern: '**/*.zip'
+              downloadPath: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId)/'
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
               IISDeploymentType: 'IISWebsite'
@@ -114,7 +120,7 @@ stages:
             inputs:
               WebSiteName: 'netcorepoc'
               VirtualApplication: 'netcorepoc'
-              Package: '$(Pipeline.Workspace)/drop/$(Build.BuildId)/**/*.zip'
+              Package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId)/**/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
