@@ -96,7 +96,7 @@ stages:
               archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
               destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
               cleanDestinationFolder: true
-              overwriteExistingFiles: true
+              overwriteExistingFiles: false
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
               IISDeploymentType: 'IISWebsite'
