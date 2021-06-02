@@ -56,10 +56,13 @@ stages:
         publishWebProjects: true
         arguments: '-c Release'
         modifyOutputPath: false
-
+    - task: CopyFiles@2
+      inputs:
+        Contents: '**/*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/Build.BuildId'
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: '$(Pipeline.Workspace)'
+        targetPath: '''$(Build.ArtifactStagingDirectory)/Build.BuildId'''
         publishLocation: 'pipeline'
     
       
