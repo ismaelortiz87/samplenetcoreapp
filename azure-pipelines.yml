@@ -27,11 +27,11 @@ stages:
           platform: '$(buildPlatform)'
           configuration: 'Release'
 
-      - task: PublishBuildArtifacts@1
+      - task: PublishPipelineArtifact@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-          ArtifactName: 'drop'
-          publishLocation: 'Container'
+          targetPath: '$(Pipeline.Workspace)'
+          artifact: 'drop'
+          publishLocation: 'pipeline'
 
       # - task: AzureRmWebAppDeployment@4
       #   inputs:
