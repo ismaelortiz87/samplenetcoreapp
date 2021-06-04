@@ -37,11 +37,16 @@ stages:
         Contents: '**/*.zip'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
         flattenFolders: true
-    - task: PublishPipelineArtifact@1
+    # - task: PublishPipelineArtifact@1
+    #   inputs:
+    #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+    #     artifact: '$(Build.BuildId)'
+    #     publishLocation: 'pipeline'
+    - task: PublishBuildArtifacts@1
       inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
-        artifact: '$(Build.BuildId)'
-        publishLocation: 'pipeline'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     
         
 - stage: deploy
