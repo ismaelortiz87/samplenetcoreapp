@@ -56,9 +56,8 @@ stages:
     pool:
       vmImage: 'windows-latest'
     environment:
-     name: 'serautsqa01'
+     name: '$(Build.SourceBranchName)'
      resourceType: VirtualMachine
-     resourceName: 'SERAUTSQA01'
     strategy:
       runOnce:
         deploy:
