@@ -62,20 +62,20 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: IISWebAppManagementOnMachineGroup@0
-            inputs:
-              IISDeploymentType: 'IISWebsite'
-              ActionIISWebsite: 'CreateOrUpdateWebsite'
-              WebsiteName: 'netcore4'
-              WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore4'
-              WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
-              AddBinding: true
-              Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5004","hostname":"","sslThumbprint":"","sniFlag":false}]}'
-              CreateOrUpdateAppPoolForWebsite: true
-              AppPoolNameForWebsite: 'netcore4'
-              DotNetVersionForWebsite: 'No Managed Code'
-              PipeLineModeForWebsite: 'Integrated'
-              AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+          # - task: IISWebAppManagementOnMachineGroup@0
+          #   inputs:
+          #     IISDeploymentType: 'IISWebsite'
+          #     ActionIISWebsite: 'CreateOrUpdateWebsite'
+          #     WebsiteName: 'netcore4'
+          #     WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore4'
+          #     WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+          #     AddBinding: true
+          #     Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5004","hostname":"","sslThumbprint":"","sniFlag":false}]}'
+          #     CreateOrUpdateAppPoolForWebsite: true
+          #     AppPoolNameForWebsite: 'netcore4'
+          #     DotNetVersionForWebsite: 'No Managed Code'
+          #     PipeLineModeForWebsite: 'Integrated'
+          #     AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
           - task: IISWebAppDeploymentOnMachineGroup@0
             inputs:
               WebSiteName: 'netcore4'
