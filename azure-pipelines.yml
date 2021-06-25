@@ -16,30 +16,6 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      # - task: NuGetToolInstaller@1
-      # - task: NuGetCommand@2
-      #   inputs:
-      #     restoreSolution: '$(solution)'
-
-      # - task: VSBuild@1
-      #   inputs:
-      #     solution: '**\*.sln'
-      #     platform: '$(buildPlatform)'
-      #     configuration: 'Release'
-
-      # - task: PublishPipelineArtifact@1
-      #   inputs:
-      #     targetPath: '$(Pipeline.Workspace)'
-      #     artifact: 'drop'
-      #     publishLocation: 'pipeline'
-
-      # - task: AzureRmWebAppDeployment@4
-      #   inputs:
-      #     ConnectionType: 'AzureRM'
-      #     azureSubscription: 'io_subscription'
-      #     appType: 'webApp'
-      #     WebAppName: 'netcorepoc'
-      #     packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
 
     - task: UseDotNet@2
       inputs:
@@ -59,23 +35,19 @@ stages:
     - task: CopyFiles@2
       inputs:
         Contents: '**/*.zip'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         flattenFolders: true
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
-        artifact: '$(Build.BuildId)'
-        publishLocation: 'pipeline'
-    
-      
-    # - task: ArchiveFiles@2
-    #   displayName: 'Zipping Generated Artifacts'
+    # - task: PublishPipelineArtifact@1
     #   inputs:
-    #       rootFolderOrFile: 
-    #       includeRootFolder: false
-    #       archiveType: 'zip'
-    #       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
-    #       replaceExistingArchive: true
+    #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+    #     artifact: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+    #     publishLocation: 'pipeline'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+        ArtifactName: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+        publishLocation: 'Container'
+    
         
 - stage: deploy
   jobs:
@@ -84,37 +56,30 @@ stages:
     pool:
       vmImage: 'windows-latest'
     environment:
-     name: 'io-iis'
+     name: '$(Build.SourceBranchName)'
      resourceType: VirtualMachine
-     resourceName: kuzko
     strategy:
       runOnce:
         deploy:
           steps:
-          # - task: ExtractFiles@1
+          # - task: IISWebAppManagementOnMachineGroup@0
           #   inputs:
-          #     archiveFilePatterns: '$(Pipeline.Workspace)/drop/**/*.zip'
-          #     destinationFolder: '$(Pipeline.Workspace)/drop/$(Build.BuildId)'
-          #     cleanDestinationFolder: true
-          #     overwriteExistingFiles: false
-          - task: IISWebAppManagementOnMachineGroup@0
-            inputs:
-              IISDeploymentType: 'IISWebsite'
-              ActionIISWebsite: 'CreateOrUpdateWebsite'
-              WebsiteName: 'netcore4'
-              WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore4'
-              WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
-              AddBinding: true
-              Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5004","hostname":"","sslThumbprint":"","sniFlag":false}]}'
-              CreateOrUpdateAppPoolForWebsite: true
-              AppPoolNameForWebsite: 'netcore4'
-              DotNetVersionForWebsite: 'No Managed Code'
-              PipeLineModeForWebsite: 'Integrated'
-              AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
+          #     IISDeploymentType: 'IISWebsite'
+          #     ActionIISWebsite: 'CreateOrUpdateWebsite'
+          #     WebsiteName: 'netcore4'
+          #     WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore4'
+          #     WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
+          #     AddBinding: true
+          #     Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5004","hostname":"","sslThumbprint":"","sniFlag":false}]}'
+          #     CreateOrUpdateAppPoolForWebsite: true
+          #     AppPoolNameForWebsite: 'netcore4'
+          #     DotNetVersionForWebsite: 'No Managed Code'
+          #     PipeLineModeForWebsite: 'Integrated'
+          #     AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
           - task: IISWebAppDeploymentOnMachineGroup@0
             inputs:
               WebSiteName: 'netcore4'
-              Package: '$(Pipeline.Workspace)/$(Build.BuildId)/*.zip'
+              Package: '$(Pipeline.Workspace)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
