@@ -35,17 +35,17 @@ stages:
     - task: CopyFiles@2
       inputs:
         Contents: '**/*.zip'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         flattenFolders: true
     # - task: PublishPipelineArtifact@1
     #   inputs:
-    #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
-    #     artifact: '$(Build.BuildId)'
+    #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+    #     artifact: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
     #     publishLocation: 'pipeline'
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
-        ArtifactName: '$(Build.BuildId)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
+        ArtifactName: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         publishLocation: 'Container'
     
         
@@ -79,7 +79,7 @@ stages:
           - task: IISWebAppDeploymentOnMachineGroup@0
             inputs:
               WebSiteName: 'netcore4'
-              Package: '$(Pipeline.Workspace)/$(Build.BuildId)/*.zip'
+              Package: '$(Pipeline.Workspace)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip/*.zip'
               TakeAppOfflineFlag: true
           - task: IISWebAppManagementOnMachineGroup@0
             inputs:
