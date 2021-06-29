@@ -19,7 +19,7 @@ stages:
     - task: dependency-check-build-task@6
       inputs:
         projectName: 'NetCore Basic'
-        scanPath: 'IsmaelApp.UI/wwwroot/lib'
+        scanPath: '**/*.csproj'
         format: 'HTML'
     - task: UseDotNet@2
       inputs:
