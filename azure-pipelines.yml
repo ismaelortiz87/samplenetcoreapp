@@ -37,52 +37,11 @@ stages:
         Contents: '**/*.zip'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         flattenFolders: true
-    # - task: PublishPipelineArtifact@1
-    #   inputs:
-    #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
-    #     artifact: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
-    #     publishLocation: 'pipeline'
+
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         ArtifactName: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         publishLocation: 'Container'
     
-        
-- stage: deploy
-  jobs:
-  - deployment: VMDeploy
-    displayName: deploying onpremise
-    pool:
-      vmImage: 'windows-latest'
-    environment:
-     name: '$(Build.SourceBranchName)'
-     resourceType: VirtualMachine
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          # - task: IISWebAppManagementOnMachineGroup@0
-          #   inputs:
-          #     IISDeploymentType: 'IISWebsite'
-          #     ActionIISWebsite: 'CreateOrUpdateWebsite'
-          #     WebsiteName: 'netcore4'
-          #     WebsitePhysicalPath: 'C:\inetpub\wwwroot\netcore4'
-          #     WebsitePhysicalPathAuth: 'WebsiteUserPassThrough'
-          #     AddBinding: true
-          #     Bindings: '{"bindings":[{"protocol":"http","ipAddress":"All Unassigned","port":"5004","hostname":"","sslThumbprint":"","sniFlag":false}]}'
-          #     CreateOrUpdateAppPoolForWebsite: true
-          #     AppPoolNameForWebsite: 'netcore4'
-          #     DotNetVersionForWebsite: 'No Managed Code'
-          #     PipeLineModeForWebsite: 'Integrated'
-          #     AppPoolIdentityForWebsite: 'ApplicationPoolIdentity'
-          - task: IISWebAppDeploymentOnMachineGroup@0
-            inputs:
-              WebSiteName: 'netcore4'
-              Package: '$(Pipeline.Workspace)/$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip/*.zip'
-              TakeAppOfflineFlag: true
-          - task: IISWebAppManagementOnMachineGroup@0
-            inputs:
-              IISDeploymentType: 'IISWebsite'
-              ActionIISWebsite: 'StartWebsite'
-              StartStopWebsiteName: 'netcore4'
+      
