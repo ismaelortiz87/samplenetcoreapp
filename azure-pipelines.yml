@@ -16,7 +16,11 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-
+    - task: dependency-check-build-task@6
+      inputs:
+        projectName: 'NetCore Basic'
+        scanPath: 'IsmaelApp.UI/wwwroot/lib'
+        format: 'HTML'
     - task: UseDotNet@2
       inputs:
         version: '5.0.x'
