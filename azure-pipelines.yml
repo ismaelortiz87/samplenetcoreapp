@@ -20,8 +20,11 @@ stages:
       inputs:
         SonarCloud: 'sonar'
         organization: 'testlabs'
-        scannerMode: 'MSBuild'
-        projectKey: 'maetestlab'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'maetestlabs'
+        cliProjectName: 'DevOps Nights Workshop'
+        cliSources: '.'
     #     projectName: 'DevOps Nights Workshop'
     # - task: dependency-check-build-task@6
     #   inputs:
