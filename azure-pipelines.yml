@@ -16,11 +16,18 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - task: dependency-check-build-task@6
+    - task: SonarCloudPrepare@1
       inputs:
-        projectName: 'NetCore Basic'
-        scanPath: '**/*.csproj'
-        format: 'HTML'
+        SonarCloud: 'sonar'
+        organization: 'testlabs'
+        scannerMode: 'MSBuild'
+        projectKey: 'maetestlab'
+    #     projectName: 'DevOps Nights Workshop'
+    # - task: dependency-check-build-task@6
+    #   inputs:
+    #     projectName: 'NetCore Basic'
+    #     scanPath: '**/*.csproj'
+    #     format: 'HTML'
     - task: UseDotNet@2
       inputs:
         version: '5.0.x'
@@ -48,4 +55,7 @@ stages:
         ArtifactName: '$(Build.Repository.Name) - $(Build.SourceBranchName) - $(Build.BuildId).zip'
         publishLocation: 'Container'
     
-      
+    - task: SonarCloudAnalyze@1
+    - task: SonarCloudPublish@1
+      inputs:
+        pollingTimeoutSec: '300'
