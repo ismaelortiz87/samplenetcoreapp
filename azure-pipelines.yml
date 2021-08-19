@@ -62,3 +62,10 @@ stages:
     - task: SonarCloudPublish@1
       inputs:
         pollingTimeoutSec: '300'
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Azure Sample sub'
+        appType: 'webApp'
+        WebAppName: 'sampleapps'
+        packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
